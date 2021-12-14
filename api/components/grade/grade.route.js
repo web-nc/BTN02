@@ -1,8 +1,8 @@
 import express from "express";
-import gradeController from "./assignment.controller.js";
+import gradeController from "./grade.controller.js";
 
 const router = express.Router();
 
-
+router.get("/:courseId", gradeController.getGrades);
 
 export default router;

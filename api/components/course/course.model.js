@@ -9,7 +9,7 @@ const Course = new mongoose.Schema({
     details: String,
     code: String,
     briefName: String,
-    gradesBoard: Array,
+    gradeBoard: Array,
 });
 
 export default mongoose.model("course", Course, "course");

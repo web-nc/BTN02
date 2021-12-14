@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const Grade = new mongoose.Schema({
     assignment: mongoose.Schema.Types.ObjectId,
-    studentID: String,
+    studentId: String,
     finalized: Boolean,
     point: Number,
 });
