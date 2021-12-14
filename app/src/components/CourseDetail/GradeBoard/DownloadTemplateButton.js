@@ -3,6 +3,7 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { ExportToCsv } from "export-to-csv";
 import moment from "moment";
+import { toast } from "react-toastify";
 
 const options = {
   fieldSeparator: ",",
@@ -27,13 +28,16 @@ export default function DownloadTemplateButton({ indexCols }) {
 
   const executeDownloadFile = () => {
     const csvExporter = new ExportToCsv(options);
-    csvExporter.generateCsv(
-      indexCols.map((col) => ({
-        studentId: col.studentId,
-        studentName: col.studentName,
-        grade: "",
-      }))
-    );
+    const data = indexCols.map((col) => ({
+      studentId: col.studentId,
+      studentName: col.studentName,
+      grade: "",
+    }));
+    if (data.length) {
+      csvExporter.generateCsv(data);
+    } else {
+      toast.warning("Thất bại do thiếu dữ liệu");
+    }
     setOpen(false);
   };
 

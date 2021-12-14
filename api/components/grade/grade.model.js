@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const Grade = new mongoose.Schema({
     assignment: mongoose.Schema.Types.ObjectId,
     studentId: String,
-    finalized: Boolean,
+    finalized: { type: Boolean, default: false },
     point: Number,
 });
 
