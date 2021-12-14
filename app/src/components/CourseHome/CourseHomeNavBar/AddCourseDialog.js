@@ -55,7 +55,7 @@ export default function FormDialog({ openDialog, handleDialogClose }) {
             label="Tên lớp (không bỏ trống)"
             type="text"
             fullWidth
-            variant="standard"
+            variant="outlined"
             name="name"
           />
           <TextField
@@ -64,7 +64,7 @@ export default function FormDialog({ openDialog, handleDialogClose }) {
             label="Chủ đề"
             type="text"
             fullWidth
-            variant="standard"
+            variant="outlined"
             name="briefName"
           />
           <RichTextEditor editorState={details} setEditorState={setDetails} />

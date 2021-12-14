@@ -7,7 +7,7 @@ function CourseInfo({ details }) {
             <Typography color="text.secondary" display="block" variant="caption" >
                 Chi tiết lớp học
             </Typography>
-            {details}
+            <div dangerouslySetInnerHTML={{ __html: details }} />
         </div>
     );
 }

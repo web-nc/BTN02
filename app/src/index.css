@@ -138,9 +138,33 @@ h5 {
 }
 
 .rich-editor {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.42);
+  position: relative;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+  border-radius: 4px;
+  cursor: text;
+  padding: 16.5px 14px;
 }
 
-.rich-editor.hasFocus {
-  border-bottom: 2px solid #1976d2;
+.rich-editor.hasFocus .rich-editor-borderline {
+  border-width: 2px;
+  border-color: #1976d2;
+}
+
+.rich-editor-borderline {
+  text-align: left;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  top: -5px;
+  left: 0;
+  margin: 0;
+  padding: 0 8px;
+  pointer-events: none;
+  border-radius: inherit;
+  border-style: solid;
+  border-width: 1px;
+  overflow: hidden;
+  min-width: 0%;
+  border-color: rgba(0, 0, 0, 0.23);
 }

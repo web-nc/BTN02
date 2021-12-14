@@ -20,12 +20,20 @@ export default function RichTextEditor({ editorState, setEditorState }) {
         onFocus={() => setHasFocus(!hasFocus)}
         onBlur={() => setHasFocus(!hasFocus)}
         toolbar={{
-          options: ["inline", "blockType", "fontSize", "fontFamily", "list", "textAlign", "colorPicker", "history"],
+          options: ["inline", "blockType", "fontSize", "list", "textAlign", "colorPicker", "history"],
           inline: {
             options: ["bold", "italic", "underline", "strikethrough", "monospace"],
           },
+          list: {
+            options: ["unordered", "ordered"],
+          },
+          textAlign: {
+            options: ["left", "center", "right"],
+          },
         }}
       />
+
+      <div className="rich-editor-borderline" />
     </div>
   );
 }
