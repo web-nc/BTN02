@@ -40,7 +40,6 @@ export default function MenuDrawer() {
           <ListItemText primary={"Trang chủ"} />
         </ListItem>
       </List>
-      <Divider />
 
       <MenuTabs courses={courses} role={"OWNER"} />
       <MenuTabs courses={courses} role={"TEACHER"} />
