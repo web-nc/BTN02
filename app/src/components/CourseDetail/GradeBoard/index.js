@@ -2,8 +2,9 @@ import { Paper, Card, CardHeader, CardContent } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { getGrades, editGrade } from "../../../services/grade";
-import DownloadTemplateButton from "./DownloadTemplateButton";
+import CustomColumnMenu from "./CustomColumnMenu";
 import { toast } from "react-toastify";
+import CustomToolbar from "./CustomToolbar";
 
 const paperStyle = {
   width: "60%",
@@ -89,6 +90,31 @@ export default function GradeBoard({ course, assignments }) {
     });
   };
 
+  const handleUpdateAGradeColumn = (data) => {
+    data.forEach((item) => {
+      const { studentId, assignment, point } = item;
+      if (point && point >= 0 && point <= 100) {
+        setRows((prevRows) => {
+          return prevRows.map((row) => {
+            if (row.id === studentId) {
+              let updatedRow = Object.assign({}, row);
+              updatedRow[assignment] = point;
+              return updatedRow;
+            } else return row;
+          });
+        });
+
+        editGrade({
+          assignment,
+          studentId,
+          point,
+        }).catch((err) => {
+          toast.error("Có lỗi xảy ra khi cập nhật!");
+        });
+      }
+    });
+  };
+
   useEffect(() => {
     if (course.gradeBoard) {
       setRows(
@@ -109,11 +135,6 @@ export default function GradeBoard({ course, assignments }) {
 
   return (
     <div style={paperStyle}>
-      <div style={{ ...innerField, display: "flex", alignContent: "center", flexDirection: "row" }}>
-        <div style={{ margin: "0 0.25rem" }}>
-          <DownloadTemplateButton indexCols={rows} />
-        </div>
-      </div>
       <Paper elevation={10} style={innerField}>
         <Card>
           <CardHeader
@@ -134,8 +155,12 @@ export default function GradeBoard({ course, assignments }) {
                 console.log(newSelection, a);
               }}
               onCellEditCommit={handleEditCell}
-              disableColumnMenu
               autoHeight
+              components={{
+                ColumnMenu: CustomColumnMenu,
+                Toolbar: CustomToolbar,
+              }}
+              componentsProps={{ columnMenu: { onFileSelect: handleUpdateAGradeColumn }, toolbar: { rows: rows, columns: columns } }}
             />
           </CardContent>
         </Card>
