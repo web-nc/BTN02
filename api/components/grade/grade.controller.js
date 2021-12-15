@@ -54,7 +54,30 @@ export default {
                 res.status(200).json({ message: "UPDATE_SUCCESSFUL" });
             }
         );
+    },
 
-        
+    finalizeGrade: async (req, res) => {
+        const { assignment, studentId } = req.body.data;
+
+        Grade.updateOne(
+            { assignment: assignment, studentId: studentId},
+            { finalized: true},
+            function (err, doc) {
+                if (err) return res.send(500, {error: err});
+                if (!doc) return res.send(500, {error: 'INVALID_INPUT'});
+                res.status(200).json({ message: "UPDATE_SUCCESSFUL" });
+            }
+        );
+    },
+
+    finalizeAssignment: async (req, res) => {
+        Grade.updateMany(
+            { assignment: req.body.assignmentId },
+            { finalized: true},
+            function (err, doc) {
+                if (err) return res.send(500, {error: err});
+                res.status(200).json({ message: "UPDATE_SUCCESSFUL" });
+            }
+        );
     },
 };
