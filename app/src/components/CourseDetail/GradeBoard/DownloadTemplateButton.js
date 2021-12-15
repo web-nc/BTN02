@@ -1,6 +1,6 @@
 import React from "react";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tooltip } from "@mui/material";
 import { ExportToCsv } from "export-to-csv";
 import moment from "moment";
 
@@ -42,10 +42,12 @@ export default function DownloadTemplateButton({ indexCols }) {
 
   return (
     <div>
-      <Button onClick={handleClickOpen} variant="outlined" color="primary" sx={{ textTransform: "none" }}>
-        <span style={{ marginRight: "0.25rem", fontWeight: "bold" }}>Tải Template</span>
-        <FileDownloadIcon />
-      </Button>
+      <Tooltip title="Tải xuống mẫu nhập điểm">
+        <Button onClick={handleClickOpen} variant="outlined" color="primary" sx={{ textTransform: "none" }}>
+          <span style={{ marginRight: "0.25rem", fontWeight: "bold" }}>Tải Template</span>
+          <FileDownloadIcon />
+        </Button>
+      </Tooltip>
       <Dialog
         open={open}
         onClose={handleClose}

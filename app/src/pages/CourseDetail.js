@@ -41,7 +41,19 @@ export default function CourseDetail() {
       <Routes>
         <Route path="/*" element={<Navigate to="/404" />} />
         <Route path="info" element={<CourseInfo role={course.role} course={course} assignments={assignments} />} />
-        <Route path="grade" element={<GradeBoard role={course.role} course={course} assignments={assignments} />} />
+        <Route
+          path="grade"
+          element={
+            <GradeBoard
+              role={course.role}
+              course={course}
+              assignments={assignments}
+              handleUpdateCourse={(payload) => {
+                setCourse((prevState) => ({ ...prevState, gradeBoard: payload }));
+              }}
+            />
+          }
+        />
         <Route path="people" element={<CoursePeople course={course} />} />
         <Route
           path="assignment"

@@ -2,6 +2,7 @@ import { Paper, Card, CardHeader, CardContent } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { getGrades, editGrade } from "../../../services/grade";
+import { updateGradeBoard } from "../../../services/course";
 import CustomColumnMenu from "./CustomColumnMenu";
 import { toast } from "react-toastify";
 import CustomToolbar from "./CustomToolbar";
@@ -17,7 +18,7 @@ const innerField = {
   marginBottom: "0.25rem",
 };
 
-export default function GradeBoard({ course, assignments }) {
+export default function GradeBoard({ course, assignments, handleUpdateCourse }) {
   const calcGPA = (row) => {
     const totalAssignmentsWeight = assignments.reduce((pre, cur) => pre + cur.weight, 0);
     let GPA = 0;
@@ -115,6 +116,21 @@ export default function GradeBoard({ course, assignments }) {
     });
   };
 
+  const handleUpdateStudentList = (data) => {
+    updateGradeBoard(course._id, data)
+      .then((res) => {
+        if (res.status === 200) {
+          handleUpdateCourse(res.data.payload);
+          toast.success("Tải lên thành công!");
+        }
+      })
+      .catch((err) => {
+        if (err.status === 401) {
+          toast.warn("Thiếu quyền để thực hiện thao tác");
+        }
+      });
+  };
+
   useEffect(() => {
     if (course.gradeBoard) {
       setRows(
@@ -160,7 +176,10 @@ export default function GradeBoard({ course, assignments }) {
                 ColumnMenu: CustomColumnMenu,
                 Toolbar: CustomToolbar,
               }}
-              componentsProps={{ columnMenu: { onFileSelect: handleUpdateAGradeColumn }, toolbar: { rows: rows, columns: columns } }}
+              componentsProps={{
+                columnMenu: { onFileSelect: handleUpdateAGradeColumn },
+                toolbar: { rows: rows, columns: columns, onFileSelect: handleUpdateStudentList },
+              }}
             />
           </CardContent>
         </Card>

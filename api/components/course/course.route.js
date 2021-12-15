@@ -19,6 +19,8 @@ router.post("/invite/student", courseController.sendStudentEmail);
 
 router.put("/:id", courseController.updateOneCourse);
 
+router.put("/:id/gradeboard", courseController.updateGradeBoard);
+
 router.delete("/:id", courseController.deleteOneCourse);
 
 router.post("/leaveCourse", courseController.leaveCourse);

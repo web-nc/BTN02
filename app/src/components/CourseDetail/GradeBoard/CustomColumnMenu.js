@@ -13,15 +13,22 @@ export default function CustomColumnMenu({ hideMenu, currentColumn, onFileSelect
       complete: function (results) {
         const { data } = results;
         const keys = data.splice(0, 1)[0];
-        const rs = data.map((v) => {
-          let newValue = {};
-          for (let i = 0; i < keys.length; i++) {
-            newValue[keys[i]] = v[i];
-          }
-          // Add assignment ID, point props
-          newValue.assignment = currentColumn.field;
-          return newValue;
-        });
+        const rs = data
+          .filter((v) => {
+            for (let i = 0; i < keys.length; i++) {
+              if (v[i]) return true;
+            }
+            return false;
+          })
+          .map((v) => {
+            let newValue = {};
+            for (let i = 0; i < keys.length; i++) {
+              newValue[keys[i]] = v[i];
+            }
+            // Add assignment ID props
+            newValue.assignment = currentColumn.field;
+            return newValue;
+          });
         onFileSelect(rs);
       },
     });
@@ -38,7 +45,7 @@ export default function CustomColumnMenu({ hideMenu, currentColumn, onFileSelect
         <div>
           <input ref={fileUploader} type="file" accept=".csv" onChange={handleFileInput} hidden />
           <Button onClick={handleUploadFile} variant="text" sx={{ px: 2, textTransform: "none", color: "GrayText" }}>
-            Upload điểm
+            Tải điểm lên
           </Button>
         </div>
       )}

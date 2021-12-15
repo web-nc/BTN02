@@ -1,6 +1,6 @@
 import React from "react";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tooltip } from "@mui/material";
 import { ExportToCsv } from "export-to-csv";
 import moment from "moment";
 
@@ -49,10 +49,12 @@ export default function ExportGradesButton({ dataRows, headers }) {
 
   return (
     <div>
-      <Button onClick={handleClickOpen} variant="outlined" color="primary" sx={{ textTransform: "none" }}>
-        <span style={{ marginRight: "0.25rem", fontWeight: "bold" }}>Tải bảng điểm</span>
-        <FileDownloadIcon />
-      </Button>
+      <Tooltip title="Tải toàn bộ bảng điểm">
+        <Button onClick={handleClickOpen} variant="outlined" color="primary" sx={{ textTransform: "none" }}>
+          <span style={{ marginRight: "0.25rem", fontWeight: "bold" }}>Tải bảng điểm</span>
+          <FileDownloadIcon />
+        </Button>
+      </Tooltip>
       <Dialog
         open={open}
         onClose={handleClose}

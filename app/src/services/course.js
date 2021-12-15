@@ -51,3 +51,7 @@ export function deleteOneCourse(id) {
 export function leaveCourse(courseId) {
   return axios.post(API_URL + "/leaveCourse", { courseId });
 }
+
+export function updateGradeBoard(id, data) {
+  return axios.put(API_URL + "/" + id + "/gradeboard", { data });
+}

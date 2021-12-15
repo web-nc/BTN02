@@ -398,5 +398,34 @@ export default {
       }
       res.status(200).json({ payload: c, message: "Rời khỏi lớp học thành công!" });
     });
+  },
+
+  updateGradeBoard: async (req, res) => {
+    const _id = req.params.id;
+    const userId = req.user._id;
+    const { data } = req.body;
+
+    const course = await Course.findOne({ _id: _id });
+
+    const isTeacher = course.teachers.some((teacher) =>
+      userId.equals(teacher._id)
+    );
+    const isOwner = userId.equals(course.owner);
+
+    if (!(isTeacher || isOwner)) {
+      return res.status(401).json({ message: "NO_PERMISSION" });
+    }
+
+    if (course.gradeBoard) {
+      data.forEach(d => {
+        // update name if studentId matched
+        course.gradeBoard = course.gradeBoard.map((g) => g.studentId === d.studentId ? d : g);
+        // add new element
+        if (d && d.studentId && !course.gradeBoard.some((g) => g.studentId === d.studentId)) course.gradeBoard.push(d);
+      });
+    }
+    course.save();
+
+    return res.status(200).json({ payload: course.gradeBoard });
   }
 };
