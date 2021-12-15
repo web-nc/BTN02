@@ -1,9 +1,22 @@
 import React, { useRef } from "react";
 import { GridColumnMenuContainer } from "@mui/x-data-grid";
-import { Button } from "@mui/material";
+import { Button, Box } from "@mui/material";
 import Papa from "papaparse";
 
-export default function CustomColumnMenu({ hideMenu, currentColumn, onFileSelect }) {
+const menuItemStyle = {
+  px: 2,
+  textTransform: 'none',
+  color: 'GrayText',
+  textAlign: 'left',
+  marginRight: 'auto'
+}
+
+export default function CustomColumnMenu({ 
+  hideMenu,
+  currentColumn,
+  onFileSelect,
+  onFinalize
+}) {
   const fileUploader = useRef(null);
   const container = useRef(null);
 
@@ -39,15 +52,23 @@ export default function CustomColumnMenu({ hideMenu, currentColumn, onFileSelect
     container.current.style.display = "none";
   };
 
+  const handleFinalizedAssignment = () => {
+    onFinalize(currentColumn.field);
+    container.current.style.display = "none";
+  }
+
   return (
     <GridColumnMenuContainer ref={container} hideMenu={hideMenu} currentColumn={currentColumn}>
       {isEditableField(currentColumn.headerName) && (
-        <div>
+        <Box sx={{ display: "flex", flexDirection: "column" }} >
           <input ref={fileUploader} type="file" accept=".csv" onChange={handleFileInput} hidden />
-          <Button onClick={handleUploadFile} variant="text" sx={{ px: 2, textTransform: "none", color: "GrayText" }}>
+          <Button onClick={handleUploadFile} variant="text" style={menuItemStyle}>
             Tải điểm lên
           </Button>
-        </div>
+          <Button onClick={handleFinalizedAssignment} variant="text" style={menuItemStyle}>
+            Công bố
+          </Button>
+        </Box>
       )}
     </GridColumnMenuContainer>
   );

@@ -7,6 +7,7 @@ import CourseInfo from "../components/CourseDetail/CourseInfo/";
 import CoursePeople from "../components/CourseDetail/CoursePeople/";
 import CourseSetting from "../components/CourseDetail/CourseSetting";
 import GradeBoard from "../components/CourseDetail/GradeBoard";
+import StudentGrade from "../components/CourseDetail/StudentGrade";
 import { getOneCourse } from "../services/course";
 import { getAssignments } from "../services/assignment";
 import { useDispatch } from "react-redux";
@@ -54,6 +55,7 @@ export default function CourseDetail() {
             />
           }
         />
+        <Route path="studentGrade" element={<StudentGrade course={course} assignments={assignments} />} />
         <Route path="people" element={<CoursePeople course={course} />} />
         <Route
           path="assignment"
