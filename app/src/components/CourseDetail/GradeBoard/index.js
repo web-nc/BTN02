@@ -6,6 +6,7 @@ import { updateGradeBoard } from "../../../services/course";
 import CustomColumnMenu from "./CustomColumnMenu";
 import { toast } from "react-toastify";
 import CustomToolbar from "./CustomToolbar";
+import CustomFooter from "./CustomFooter";
 import CustomCell from "./CustomCell";
 import AddCell from "./AddCell";
 
@@ -111,9 +112,9 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
       if (point && point >= 0 && point <= 100) {
         setRows((prevRows) => {
           return prevRows.map((row) => {
-            if (row.id === studentId) {
+            if (String(row.id) === String(studentId)) {
               let updatedRow = Object.assign({}, row);
-              updatedRow[assignment] = point;
+              updatedRow[assignment] = { finalized: false, point: point };
               return updatedRow;
             } else return row;
           });
@@ -121,8 +122,9 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
 
         editGrade({
           assignment,
-          studentId,
-          point,
+          studentId: String(studentId),
+          point: Number(point),
+          finalized: false,
         }).catch((err) => {
           toast.error("Có lỗi xảy ra khi cập nhật!");
         });
@@ -200,10 +202,12 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
             components={{
               ColumnMenu: CustomColumnMenu,
               Toolbar: CustomToolbar,
+              Footer: CustomFooter,
             }}
             componentsProps={{
               columnMenu: { onFileSelect: handleUpdateAGradeColumn, onFinalize: handleFinalizeColumn },
-              toolbar: { rows: rows, columns: columns, onFileSelect: handleUpdateStudentList },
+              toolbar: { rows: rows, columns: columns },
+              footer: { rows: rows, columns: columns, onFileSelect: handleUpdateStudentList }
             }}
           />
         </CardContent>

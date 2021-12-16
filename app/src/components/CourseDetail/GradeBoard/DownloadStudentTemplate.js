@@ -4,7 +4,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import XLSX from "xlsx";
 import moment from "moment";
 
-export default function ExportGradesButton({ dataRows, headers }) {
+export default function DownloadStudentTemplate({ indexCols }) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -16,36 +16,35 @@ export default function ExportGradesButton({ dataRows, headers }) {
   };
 
   const executeDownloadFile = () => {
-    const result = [];
-    dataRows.forEach((r) => {
-      let newData = {};
-      headers.forEach((h) => {
-        if (typeof r[h.field] === typeof {}) newData[h.headerName] = r[h.field].point;
-        else newData[h.headerName] = r[h.field];
-      });
-      result.push(newData);
-    });
-    console.log(result);
+    const data = indexCols.map((col) => ({
+      studentId: col.studentId,
+      studentName: col.studentName,
+    }));
+    if (!data.length) {
+      data.push({ studentId: null, studentName: null });
+    }
 
+    const headers = [["studentId", "studentName"]];
     //Had to create a new workbook and then add the header
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet([]);
+    XLSX.utils.sheet_add_aoa(ws, headers);
 
     //Starting in the second row to avoid overriding and skipping headers
-    XLSX.utils.sheet_add_json(ws, result);
+    XLSX.utils.sheet_add_json(ws, data, { origin: "A2", skipHeader: true });
 
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
-    XLSX.writeFile(wb, "grades_" + moment(new Date()).format("YYYY-MM-DD-hh-mm-ss") + ".xlsx");
+    XLSX.writeFile(wb, "student_tp_" + moment(new Date()).format("YYYY-MM-DD-hh-mm-ss") + ".xlsx");
 
     setOpen(false);
   };
 
   return (
     <div>
-      <Tooltip title="Tải toàn bộ bảng điểm">
+      <Tooltip title="Tải xuống mẫu nhập danh sách học sinh">
         <Button onClick={handleClickOpen} variant="outlined" color="primary" sx={{ textTransform: "none" }}>
-          <span style={{ marginRight: "0.25rem", fontWeight: "bold" }}>Tải bảng điểm</span>
+          <span style={{ marginRight: "0.25rem", fontWeight: "bold" }}>Mẫu học sinh</span>
           <FileDownloadIcon />
         </Button>
       </Tooltip>
@@ -54,10 +53,10 @@ export default function ExportGradesButton({ dataRows, headers }) {
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description">
-        <DialogTitle id="alert-dialog-title">Xác nhận tải xuống bảng điểm của lớp?</DialogTitle>
+        <DialogTitle id="alert-dialog-title">Xác nhận bạn muốn tải xuống mẫu nhập danh sách học sinh?</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Nội dung tải về sẽ được lưu dưới dạng (.xlsx). Bạn có thể mở bằng excel để xem tiện hơn
+            Nội dung tải về sẽ được lưu dưới dạng (.xlsx). Bạn có thể mở bằng excel để nhập điểm tiện hơn
           </DialogContentText>
         </DialogContent>
         <DialogActions>

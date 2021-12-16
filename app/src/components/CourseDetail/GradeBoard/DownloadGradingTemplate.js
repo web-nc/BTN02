@@ -1,20 +1,10 @@
 import React from "react";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tooltip } from "@mui/material";
-import { ExportToCsv } from "export-to-csv";
+import XLSX from "xlsx";
 import moment from "moment";
 
-let options = {
-  fieldSeparator: ",",
-  quoteStrings: '"',
-  decimalSeparator: ".",
-  filename: "template_" + moment(new Date()).format("YYYY-MM-DD-hh-mm-ss"),
-  useTextFile: false,
-  useBom: true,
-  useKeysAsHeaders: true,
-};
-
-export default function DownloadTemplateButton({ indexCols }) {
+export default function DownloadGradingTemplate({ indexCols }) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -26,17 +16,27 @@ export default function DownloadTemplateButton({ indexCols }) {
   };
 
   const executeDownloadFile = () => {
-    options.filename = "template_" + moment(new Date()).format("YYYY-MM-DD-hh-mm-ss");
-    const csvExporter = new ExportToCsv(options);
     const data = indexCols.map((col) => ({
       studentId: col.studentId,
-      studentName: col.studentName,
       point: "",
     }));
     if (!data.length) {
-      data.push({ studentId: null, studentName: null, point: null });
+      data.push({ studentId: null, point: null });
     }
-    csvExporter.generateCsv(data);
+
+    const headers = [["studentId", "point"]];
+    //Had to create a new workbook and then add the header
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet([]);
+    XLSX.utils.sheet_add_aoa(ws, headers);
+
+    //Starting in the second row to avoid overriding and skipping headers
+    XLSX.utils.sheet_add_json(ws, data, { origin: "A2", skipHeader: true });
+
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    XLSX.writeFile(wb, "grading_tp_" + moment(new Date()).format("YYYY-MM-DD-hh-mm-ss") + ".xlsx");
+
     setOpen(false);
   };
 
@@ -44,7 +44,7 @@ export default function DownloadTemplateButton({ indexCols }) {
     <div>
       <Tooltip title="Tải xuống mẫu nhập điểm">
         <Button onClick={handleClickOpen} variant="outlined" color="primary" sx={{ textTransform: "none" }}>
-          <span style={{ marginRight: "0.25rem", fontWeight: "bold" }}>Tải Template</span>
+          <span style={{ marginRight: "0.25rem", fontWeight: "bold" }}>Mẫu nhập điểm</span>
           <FileDownloadIcon />
         </Button>
       </Tooltip>
@@ -56,7 +56,7 @@ export default function DownloadTemplateButton({ indexCols }) {
         <DialogTitle id="alert-dialog-title">Xác nhận bạn muốn tải xuống mẫu nhập điểm?</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Nội dung tải về sẽ được lưu dưới dạng (.csv). Bạn có thể mở bằng excel để nhập điểm tiện hơn
+            Nội dung tải về sẽ được lưu dưới dạng (.xlsx). Bạn có thể mở bằng excel để nhập điểm tiện hơn
           </DialogContentText>
         </DialogContent>
         <DialogActions>

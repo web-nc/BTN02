@@ -43,11 +43,11 @@ export default {
     },
 
     editGrade: async (req, res) => {
-        const { assignment, studentId, point } = req.body.data;
+        const { assignment, studentId, point, finalized } = req.body.data;
         
         Grade.updateOne(
             { assignment: assignment, studentId: studentId},
-            { point: point},
+            { point: point, finalized: finalized},
             { upsert: true },
             function (err, doc) {
                 if (err) return res.send(500, {error: err});
