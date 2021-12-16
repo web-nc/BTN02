@@ -55,3 +55,4 @@ export function leaveCourse(courseId) {
 export function updateGradeBoard(id, data) {
   return axios.put(API_URL + "/" + id + "/gradeboard", { data });
 }
+

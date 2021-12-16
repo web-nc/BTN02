@@ -10,6 +10,7 @@ const Course = new mongoose.Schema({
     code: String,
     briefName: String,
     gradeBoard: Array,
+    reviewRequests: Array,
 });
 
 export default mongoose.model("course", Course, "course");

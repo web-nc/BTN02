@@ -208,8 +208,6 @@ export default {
           email: req.user.email,
         };
         result.role = "OWNER";
-        
-        console.log(result);
         res.status(200).json({ payload: result });
       }
     );

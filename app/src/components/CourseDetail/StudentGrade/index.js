@@ -2,23 +2,56 @@ import { Paper, Card, CardHeader, CardContent, IconButton, Tooltip } from "@mui/
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import React, { useState, useEffect } from "react";
 import { DataGrid } from '@mui/x-data-grid';
-import { studentGetGrades } from "../../../services/grade";
+import { studentGetGrades } from '../../../services/grade';
+import { newReviewRequest, getMyReviewRequest } from '../../../services/review';
+import RequestDialog from './RequestDialog';
+import ReviewRequest from './ReviewRequest';
+import { toast } from "react-toastify";
+
+const paperStyle = {
+  width: "60%",
+  margin: "30px auto"
+};
 
 export default function StudentGrade({ course, assignments }) {
-  
-  const paperStyle = {
-    width: "60%",
-    margin: "30px auto"
-  };
-
+  console.log(assignments);
   const [rows, setRows] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [GPA, setGPA] = useState(0);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [currentPoint, setCurrentPoint] = useState(null)
+
+  const handleDialogOpen = (assignmentId, currPoint) => {
+    setSelectedAssignment(assignmentId);
+    setCurrentPoint(currPoint);
+    setIsDialogOpen(true);
+  }
+
+  const handleDialogClose = () => {
+    setSelectedAssignment(null);
+    setCurrentPoint(null);
+    setIsDialogOpen(false);
+  }
+
+  const handleReviewRequest = (expectedPoint, explanation) => {
+    newReviewRequest({
+      assignment: selectedAssignment,
+      currentPoint,
+      expectedPoint,
+      explanation
+    }).then(res => {
+      if (res.data.successful) {
+        toast.success('Gửi yêu cầu thành công!');
+      } else {
+        toast.error(res.data.message);
+      }
+    }).catch(err => {
+      toast.error('Có lỗi xảy ra trong lúc gửi yêu cầu!');
+    });
+  }
 
   const totalAssignmentsWeight = assignments.reduce((pre, cur) => pre + cur.weight, 0);
-
-  const handleReviewRequest = (value) => {
-    console.log('You sent a review request: ' + value);
-  }
 
   const columns = [
       { field: 'name', headerName: 'Tên bài tập', sortable: false, flex: 1 },
@@ -38,7 +71,7 @@ export default function StudentGrade({ course, assignments }) {
                     </IconButton>);
           }
           return (<Tooltip title="Phúc khảo">
-                    <IconButton onClick={() => handleReviewRequest(params.id)} color="secondary" >
+                    <IconButton onClick={() => handleDialogOpen(params.id, params.row.point)} color="secondary" >
                       <RateReviewIcon />
                     </IconButton>
                   </Tooltip>);
@@ -48,7 +81,7 @@ export default function StudentGrade({ course, assignments }) {
 
   const handleUpdateRow = (id, point) => {
     setRows((prevRows) => {
-      return prevRows.map((row, index) => {
+      return prevRows.map((row) => {
         if (row.id === id) {
           return {...row, point: point};
         }
@@ -74,32 +107,44 @@ export default function StudentGrade({ course, assignments }) {
       });
     });
 
+    course._id && getMyReviewRequest(course._id).then(res => {
+      setReviews(res.data.map((review) => {
+        const assignment = assignments.find(obj => { return obj._id === review.assignment });
+        review.assignment = assignment.name;
+        return review;
+      }));
+    });
   }, [assignments, course, totalAssignmentsWeight]);
 
   return (
-    <Paper elevation={10} style={paperStyle}>
-      <Card>
-        <CardHeader
-          sx={{ backgroundColor: "#f6f2f7", textAlign: "center" }}
-          title={
-            <strong>
-              [{course.briefName}] {course.name}
-            </strong>
-          }
-          subheader={"Người tạo lớp: " + (course.owner ? course.owner.name : "")}
-        />
+    <div>
+      <Paper elevation={10} style={paperStyle}>
+        <Card>
+          <CardHeader
+            sx={{ backgroundColor: "#f6f2f7", textAlign: "center" }}
+            title={
+              <strong>
+                [{course.briefName}] {course.name}
+              </strong>
+            }
+            subheader={"Người tạo lớp: " + (course.owner ? course.owner.name : "")}
+          />
 
-        <CardContent>
-          <DataGrid 
-              sx={{ marginBottom: '10px' }}
-              rows={rows}
-              columns={columns}
-              disableColumnMenu
-              hideFooter
-              autoHeight/>
-          <strong>Điểm tổng kết: {Math.round(GPA)}/100</strong>
-        </CardContent>
-      </Card>
-    </Paper>
+          <CardContent>
+            <DataGrid 
+                sx={{ marginBottom: '10px' }}
+                rows={rows}
+                columns={columns}
+                disableColumnMenu
+                hideFooter
+                autoHeight/>
+            <strong>Điểm tổng kết: {Math.round(GPA)}/100</strong>
+          </CardContent>
+        </Card>
+      </Paper>
+
+      <RequestDialog openDialog={isDialogOpen} handleDialogClose={handleDialogClose} sendReviewRequest={handleReviewRequest} />
+      <ReviewRequest reviews={reviews} />
+    </div>
   );
 }
