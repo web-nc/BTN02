@@ -11,6 +11,6 @@ router.post("/finalize", gradeController.finalizeGrade);
 
 router.post("/finalizeAssignment", gradeController.finalizeAssignment);
 
-router.post("/:edit", gradeController.editGrade);
+router.post("/edit", gradeController.editGrade);
 
 export default router;

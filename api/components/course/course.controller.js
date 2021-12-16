@@ -416,10 +416,11 @@ export default {
 
     if (course.gradeBoard) {
       data.forEach(d => {
+        const { studentId, studentName } = d;
         // update name if studentId matched
-        course.gradeBoard = course.gradeBoard.map((g) => g.studentId === d.studentId ? d : g);
+        course.gradeBoard = course.gradeBoard.map((g) => (g.studentId === studentId && studentName) ? { studentId, studentName } : g);
         // add new element
-        if (d && d.studentId && !course.gradeBoard.some((g) => g.studentId === d.studentId)) course.gradeBoard.push(d);
+        if (d && d.studentId && !course.gradeBoard.some((g) => g.studentId === studentId)) course.gradeBoard.push({ studentId, studentName });
       });
     }
     course.save();
