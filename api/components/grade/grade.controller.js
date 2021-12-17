@@ -46,7 +46,7 @@ export default {
         const { assignment, studentId, point, finalized } = req.body.data;
         
         Grade.updateOne(
-            { assignment: assignment, studentId: studentId},
+            { assignment: assignment, studentId: studentId },
             { point: point, finalized: finalized},
             { upsert: true },
             function (err, doc) {

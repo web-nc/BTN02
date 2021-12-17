@@ -8,7 +8,7 @@ const Review = new mongoose.Schema({
     expectedPoint: Number,
     explanation: String,
     teacherComment: { type: String, default: '' },
-    updatedGrade: { type: Number, default: 0 },
+    updatedPoint: { type: Number, default: 0 },
     reviewed: { type: Boolean, default: false },
 });
 

@@ -5,6 +5,10 @@ const router = express.Router();
 
 router.get('/student/:courseId', reviewController.studentGetRequest);
 
+router.get('/teacher/:courseId', reviewController.teacherGetRequest);
+
 router.post('/', reviewController.newReview);
+
+router.put('/', reviewController.teacherReview);
 
 export default router;

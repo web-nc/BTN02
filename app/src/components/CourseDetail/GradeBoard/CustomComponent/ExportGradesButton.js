@@ -8,14 +8,14 @@ const calcGPA = (row, assignments) => {
   const totalAssignmentsWeight = assignments.reduce((pre, cur) => pre + cur.weight, 0);
   let GPA = 0;
   for (const property in row) {
-    if (property !== "id" && property !== "studentId" && property !== "studentName") {
+    if (property !== "id" && property !== "studentId" && property !== "studentName" && row[property].finalized) {
       const assignment = assignments.find((obj) => {
         return obj._id === property;
       });
       GPA = GPA + assignment.weight * row[property].point;
     }
   }
-  return (GPA = Math.floor((GPA / totalAssignmentsWeight) * 100) / 100);
+  return Math.round(GPA / totalAssignmentsWeight);
 };
 
 export default function ExportGradesButton({ dataRows, headers, assignments }) {
@@ -36,7 +36,9 @@ export default function ExportGradesButton({ dataRows, headers, assignments }) {
       headers.forEach((h) => {
         if (h.field === "total") newRow[h.headerName] = calcGPA(r, assignments);
         else {
-          if (typeof r[h.field] === typeof {}) newRow[h.headerName] = r[h.field].point;
+          if (typeof r[h.field] === typeof {}) {
+            newRow[h.headerName] = (r[h.field].finalized) ? r[h.field].point : '';
+          }
           else newRow[h.headerName] = r[h.field];
         }
       });

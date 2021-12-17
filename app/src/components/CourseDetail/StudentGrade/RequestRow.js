@@ -57,7 +57,7 @@ export default function RequestRow({ review }) {
                             <strong><i>Điểm sau khi chấm lại</i></strong>
                         </Typography>
                         <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
-                            <strong>{review.reviewed ? review.updatedGrade : 'Đang xử lí'}</strong>
+                            <strong>{review.reviewed ? review.updatedPoint : 'Đang xử lí'}</strong>
                         </Typography>
                     </Box>
                 </Collapse>

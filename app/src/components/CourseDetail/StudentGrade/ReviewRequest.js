@@ -8,10 +8,12 @@ const paperStyle = {
 };
 
 export default function RequestDialog({ reviews }) {
+
     return (
         <Paper elevation={10} style={paperStyle}>
             <TableContainer component={Paper}>
                 <Table aria-label="collapsible table">
+                    {(reviews.length === 0) && <caption>Chưa có thông tin phúc khảo</caption>}
                     <TableHead>
                         <TableRow>
                             <TableCell sx={{ width: '10px' }}/>
@@ -22,7 +24,8 @@ export default function RequestDialog({ reviews }) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {reviews.map((review) => (
+                        {(reviews.length > 0) && 
+                        reviews.map((review) => (
                             <RequestRow key={review._id} review={review} />
                         ))}
                     </TableBody>

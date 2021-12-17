@@ -14,7 +14,6 @@ const paperStyle = {
 };
 
 export default function StudentGrade({ course, assignments }) {
-  console.log(assignments);
   const [rows, setRows] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [GPA, setGPA] = useState(0);
@@ -43,12 +42,19 @@ export default function StudentGrade({ course, assignments }) {
     }).then(res => {
       if (res.data.successful) {
         toast.success('Gửi yêu cầu thành công!');
+        let newReview = res.data.newReview;
+        const assignment = assignments.find(obj => { return obj._id === newReview.assignment });
+        newReview.assignment = assignment.name;
+        setReviews([...reviews, newReview]);
       } else {
         toast.error(res.data.message);
       }
     }).catch(err => {
       toast.error('Có lỗi xảy ra trong lúc gửi yêu cầu!');
     });
+    setSelectedAssignment(null);
+    setCurrentPoint(null);
+    setIsDialogOpen(false);
   }
 
   const totalAssignmentsWeight = assignments.reduce((pre, cur) => pre + cur.weight, 0);

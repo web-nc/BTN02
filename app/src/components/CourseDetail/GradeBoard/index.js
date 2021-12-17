@@ -1,23 +1,19 @@
-import { Paper, Card, CardHeader, CardContent } from "@mui/material";
+import { Paper, Card, CardContent, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { getGrades, editGrade, finalizeGrade, finalizeAssignment } from "../../../services/grade";
 import { updateGradeBoard } from "../../../services/course";
-import CustomColumnMenu from "./CustomColumnMenu";
 import { toast } from "react-toastify";
-import CustomToolbar from "./CustomToolbar";
-import CustomFooter from "./CustomFooter";
-import CustomCell from "./CustomCell";
-import AddCell from "./AddCell";
+import CustomColumnMenu from "./CustomComponent/CustomColumnMenu";
+import CustomToolbar from "./CustomComponent/CustomToolbar";
+import CustomFooter from "./CustomComponent/CustomFooter";
+import CustomCell from "./CustomComponent/CustomCell";
+import AddCell from "./CustomComponent/AddCell";
+import ReviewRequests from "./ReviewComponent/ReviewRequests";
 
 const paperStyle = {
   width: "60%",
-  margin: "30px auto",
-  height: 300,
-};
-const innerField = {
-  marginTop: "0.5rem",
-  marginBottom: "0.25rem",
+  margin: "30px auto"
 };
 
 export default function GradeBoard({ course, assignments, handleUpdateCourse }) {
@@ -65,18 +61,6 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
       return <strong>{calcGPA(params.row, assignments)}/100</strong>;
     },
   });
-
-  const calcGPA = (row) => {
-    const totalAssignmentsWeight = assignments.reduce((pre, cur) => pre + cur.weight, 0);
-    let GPA = 0;
-      for (const property in row) {
-        if (property !== 'id' && property !== 'studentId' && property !== 'studentName' && row[property].finalized) {
-          const assignment = assignments.find(obj => { return obj._id === property });
-          GPA = GPA + assignment.weight * row[property].point;
-        }
-      }
-    return GPA = Math.round(GPA / totalAssignmentsWeight);
-  }
 
   const handleEditGrade = (assignment, studentId, point, finalized) => {
     editGrade({ assignment, studentId, point }).then(res => {
@@ -181,37 +165,45 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
   }, [course])
 
   return (
-    <div style={paperStyle}>
-      <Paper elevation={10} style={innerField}>
-      <Card>
-        <CardHeader
-          sx={{ backgroundColor: "#f6f2f7", textAlign: "center" }}
-          title={
-            <strong>
-              [{course.briefName}] {course.name}
-            </strong>
-          }
-          subheader={"Người tạo lớp: " + (course.owner ? course.owner.name : "")}
-        />
+    <div>
+      <Paper elevation={10} style={paperStyle}>
+        <Card>
+          <Typography sx={{ marginLeft: 2, marginTop: 3 }} color="text.secondary" display="block" variant="h6" >
+              <strong>Bảng điểm</strong>
+          </Typography>
+          <CardContent>
+            <DataGrid 
+              rows={rows}
+              columns={columns}
+              autoHeight
+              components={{
+                ColumnMenu: CustomColumnMenu,
+                Toolbar: CustomToolbar,
+                Footer: CustomFooter,
+              }}
+              componentsProps={{
+                columnMenu: { onFileSelect: handleUpdateAGradeColumn, onFinalize: handleFinalizeColumn },
+                toolbar: { rows, columns, assignments, onFileSelect: handleUpdateStudentList },
+                footer: { rows, columns, assignments }
+              }}
+            />
+          </CardContent>
+        </Card>
+      </Paper>
 
-        <CardContent>
-          <DataGrid 
-            rows={rows}
-            columns={columns}
-            autoHeight
-            components={{
-              ColumnMenu: CustomColumnMenu,
-              Toolbar: CustomToolbar,
-              Footer: CustomFooter,
-            }}
-            componentsProps={{
-              columnMenu: { onFileSelect: handleUpdateAGradeColumn, onFinalize: handleFinalizeColumn },
-              toolbar: { rows, columns, assignments, onFileSelect: handleUpdateStudentList },
-              footer: { rows, columns, assignments }
-            }}
-          />
-        </CardContent>
-      </Card>
-    </Paper></div>
+      <ReviewRequests assignments={assignments} course={course} />
+    </div>
   );
+}
+
+function calcGPA(row, assignments) {
+  const totalAssignmentsWeight = assignments.reduce((pre, cur) => pre + cur.weight, 0);
+  let GPA = 0;
+    for (const property in row) {
+      if (property !== 'id' && property !== 'studentId' && property !== 'studentName' && row[property].finalized) {
+        const assignment = assignments.find(obj => { return obj._id === property });
+        GPA = GPA + assignment.weight * row[property].point;
+      }
+    }
+  return GPA = Math.round(GPA / totalAssignmentsWeight);
 }

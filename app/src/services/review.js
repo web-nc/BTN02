@@ -10,3 +10,11 @@ export function newReviewRequest(data) {
 export function getMyReviewRequest(courseId) {
     return axios.get(API_URL + '/student/' + courseId);
 }
+
+export function getCourseReviewRequest(courseId) {
+    return axios.get(API_URL + '/teacher/' + courseId);
+}
+
+export function sendReview(data) {
+    return axios.put(API_URL, { data });
+}
