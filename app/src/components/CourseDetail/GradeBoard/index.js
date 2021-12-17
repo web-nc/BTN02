@@ -62,7 +62,7 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
     disableColumnMenu: true,
     width: 150,
     renderCell: (params) => {
-      return <strong>{calcGPA(params.row)}/100</strong>;
+      return <strong>{calcGPA(params.row, assignments)}/100</strong>;
     },
   });
 
@@ -206,8 +206,8 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
             }}
             componentsProps={{
               columnMenu: { onFileSelect: handleUpdateAGradeColumn, onFinalize: handleFinalizeColumn },
-              toolbar: { rows: rows, columns: columns },
-              footer: { rows: rows, columns: columns, onFileSelect: handleUpdateStudentList }
+              toolbar: { rows, columns, assignments, onFileSelect: handleUpdateStudentList },
+              footer: { rows, columns, assignments }
             }}
           />
         </CardContent>

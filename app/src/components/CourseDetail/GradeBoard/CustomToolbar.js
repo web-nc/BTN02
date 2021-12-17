@@ -1,10 +1,10 @@
 import React from "react";
 import { GridToolbarContainer, gridClasses } from "@mui/x-data-grid";
-import ExportGradesButton from "./ExportGradesButton";
 import DownloadGradingTemplate from "./DownloadGradingTemplate";
 import DownloadStudentTemplate from "./DownloadStudentTemplate";
+import ImportParticipantsButton from "./ImportParticipantsButton";
 
-export default function CustomToolbar({ rows, columns }) {
+export default function CustomToolbar({ rows, columns, onFileSelect }) {
   return (
     <GridToolbarContainer className={gridClasses.toolbarContainer}>
       <div style={{ margin: "0.5rem 0.25rem 0.25rem" }}>
@@ -14,7 +14,7 @@ export default function CustomToolbar({ rows, columns }) {
         <DownloadGradingTemplate indexCols={rows} />
       </div>
       <div style={{ margin: "0.5rem 0.25rem 0.25rem" }}>
-        <ExportGradesButton dataRows={rows} headers={columns} />
+        <ImportParticipantsButton dataRows={rows} headers={columns} onFileSelect={onFileSelect} />
       </div>
     </GridToolbarContainer>
   );

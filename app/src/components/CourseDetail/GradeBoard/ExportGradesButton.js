@@ -4,7 +4,21 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import XLSX from "xlsx";
 import moment from "moment";
 
-export default function ExportGradesButton({ dataRows, headers }) {
+const calcGPA = (row, assignments) => {
+  const totalAssignmentsWeight = assignments.reduce((pre, cur) => pre + cur.weight, 0);
+  let GPA = 0;
+  for (const property in row) {
+    if (property !== "id" && property !== "studentId" && property !== "studentName") {
+      const assignment = assignments.find((obj) => {
+        return obj._id === property;
+      });
+      GPA = GPA + assignment.weight * row[property].point;
+    }
+  }
+  return (GPA = Math.floor((GPA / totalAssignmentsWeight) * 100) / 100);
+};
+
+export default function ExportGradesButton({ dataRows, headers, assignments }) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -18,14 +32,16 @@ export default function ExportGradesButton({ dataRows, headers }) {
   const executeDownloadFile = () => {
     const result = [];
     dataRows.forEach((r) => {
-      let newData = {};
+      let newRow = {};
       headers.forEach((h) => {
-        if (typeof r[h.field] === typeof {}) newData[h.headerName] = r[h.field].point;
-        else newData[h.headerName] = r[h.field];
+        if (h.field === "total") newRow[h.headerName] = calcGPA(r, assignments);
+        else {
+          if (typeof r[h.field] === typeof {}) newRow[h.headerName] = r[h.field].point;
+          else newRow[h.headerName] = r[h.field];
+        }
       });
-      result.push(newData);
+      result.push(newRow);
     });
-    console.log(result);
 
     //Had to create a new workbook and then add the header
     const wb = XLSX.utils.book_new();
