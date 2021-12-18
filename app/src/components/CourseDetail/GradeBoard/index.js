@@ -63,17 +63,25 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
   });
 
   const handleEditGrade = (assignment, studentId, point, finalized) => {
-    editGrade({ assignment, studentId, point }).then(res => {
+    editGrade({ assignment, studentId, point }, course._id).then(res => {
       handleUpdateRow(studentId, assignment, { point, finalized});
     }).catch(err => {
+      if (err.status === 401) {
+        toast.warn("Thiếu quyền để thực hiện thao tác");
+        return;
+      }
       toast.error('Có lỗi xảy ra khi cập nhật!');
     })
   };
 
   const handleFinalizedGrade = (assignment, studentId, point) => {
-    finalizeGrade({ assignment, studentId }).then(res => {
+    finalizeGrade({ assignment, studentId }, course._id).then(res => {
       handleUpdateRow(studentId, assignment, { point, finalized: true });
     }).catch(err => {
+      if (err.status === 401) {
+        toast.warn("Thiếu quyền để thực hiện thao tác");
+        return;
+      }
       toast.error('Có lỗi xảy ra khi cập nhật!');
     })
   };
@@ -109,7 +117,11 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
           studentId: String(studentId),
           point: Number(point),
           finalized: false,
-        }).catch((err) => {
+        }, course._id).catch((err) => {
+          if (err.status === 401) {
+            toast.warn("Thiếu quyền để thực hiện thao tác");
+            return;
+          }
           toast.error("Có lỗi xảy ra khi cập nhật!");
         });
       }
@@ -117,7 +129,7 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
   };
 
   const handleFinalizeColumn = (assignmentId) => {
-    finalizeAssignment(assignmentId).then(res => {
+    finalizeAssignment(assignmentId, course._id).then(res => {
       setRows((prevRows) => {
         return prevRows.map((row, index) => {
           if (row[assignmentId] !== undefined) {
@@ -128,6 +140,10 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
         });
       });
     }).catch(err => {
+      if (err.status === 401) {
+        toast.warn("Thiếu quyền để thực hiện thao tác");
+        return;
+      }
       toast.error('Có lỗi xảy ra khi cập nhật!');
     })
   }
@@ -148,7 +164,9 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
   };
 
   useEffect(() => {
+    let isMounted = true;
     if (course.gradeBoard) {
+      if (isMounted) 
       setRows(
         course.gradeBoard.map((student) => ({
           ...student,
@@ -157,11 +175,18 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
       );
     }
 
-    course._id && getGrades(course._id).then(res => {
-      res.data.forEach((grade) => {
-        handleUpdateRow(grade.studentId, grade.assignment, { point:grade.point,finalized:grade.finalized});
-      });
-    })
+    course._id &&
+      getGrades(course._id)
+        .then((res) => {
+          res.data.forEach((grade) => {
+            if (isMounted) handleUpdateRow(grade.studentId, grade.assignment, { point: grade.point, finalized: grade.finalized });
+          });
+        })
+        .catch((err) => {
+          if (err.status === 401) toast.warn("Thiếu quyền để thực hiện thao tác");
+        });
+    
+    return () => { isMounted = false; };
   }, [course])
 
   return (
@@ -183,7 +208,7 @@ export default function GradeBoard({ course, assignments, handleUpdateCourse }) 
               }}
               componentsProps={{
                 columnMenu: { onFileSelect: handleUpdateAGradeColumn, onFinalize: handleFinalizeColumn },
-                toolbar: { rows, columns, assignments, onFileSelect: handleUpdateStudentList },
+                toolbar: { rows, columns, assignments, onFileSelect: handleUpdateStudentList, role: course.role },
                 footer: { rows, columns, assignments }
               }}
             />

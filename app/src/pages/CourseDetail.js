@@ -24,15 +24,20 @@ export default function CourseDetail() {
   };
 
   useEffect(() => {
+    let isMounted = true;
     getOneCourse(id).then((res) => {
       if (res.status === 200) {
-        setCourse(res.data.payload);
+        if (isMounted) setCourse(res.data.payload);
       }
       if (res.status === 202) {
         toast.warning(res.data.message);
       }
     });
-    getAssignments(id).then((res) => setAssignments([...res.data.assignments]));
+    getAssignments(id).then((res) => isMounted && setAssignments([...res.data.assignments]));
+
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
 
   return (
@@ -40,47 +45,76 @@ export default function CourseDetail() {
       <CourseDetailNavBar courseName={course.name} role={course.role} />
 
       <Routes>
-        <Route path="/*" element={<Navigate to="/404" />} />
+        <Route path="*" element={<Navigate to="/404" />} />
         <Route path="info" element={<CourseInfo role={course.role} course={course} assignments={assignments} />} />
+        <Route path="people" element={<CoursePeople course={course} />} />
+        <Route
+          path="studentGrade"
+          element={
+            <div>
+              {course.role === "STUDENT" ? (
+                <StudentGrade course={course} assignments={assignments} />
+              ) : (
+                <div>{course.role && <Navigate to="/404" />}</div>
+              )}
+            </div>
+          }
+        />
         <Route
           path="grade"
           element={
-            <GradeBoard
-              role={course.role}
-              course={course}
-              assignments={assignments}
-              handleUpdateCourse={(payload) => {
-                setCourse((prevState) => ({ ...prevState, gradeBoard: payload }));
-              }}
-            />
+            <div>
+              {course.role === "OWNER" || course.role === "TEACHER" ? (
+                <GradeBoard
+                  role={course.role}
+                  course={course}
+                  assignments={assignments}
+                  handleUpdateCourse={(payload) => {
+                    setCourse((prevState) => ({ ...prevState, gradeBoard: payload }));
+                  }}
+                />
+              ) : (
+                <div>{course.role && <Navigate to="/404" />}</div>
+              )}
+            </div>
           }
         />
-        <Route path="studentGrade" element={<StudentGrade course={course} assignments={assignments} />} />
-        <Route path="people" element={<CoursePeople course={course} />} />
         <Route
           path="assignment"
           element={
-            <CourseAssignment
-              courseId={id}
-              assignments={assignments}
-              handleAssignmentsChange={handleAssignmentsChange}
-            />
+            <div>
+              {course.role === "OWNER" || course.role === "TEACHER" ? (
+                <CourseAssignment
+                  courseId={id}
+                  assignments={assignments}
+                  handleAssignmentsChange={handleAssignmentsChange}
+                />
+              ) : (
+                <div>{course.role && <Navigate to="/404" />}</div>
+              )}
+            </div>
           }
         />
         <Route
           path="setting"
           element={
-            <CourseSetting
-              role={course.role}
-              name={course.name}
-              details={course.details}
-              briefName={course.briefName}
-              id={id}
-              handleUpdateCourse={(payload) => {
-                setCourse((prevState) => ({ ...prevState, ...payload }));
-                dispatch({ type: "COURSES_UPDATED", payload });
-              }}
-            />
+            <div>
+              {course.role === "OWNER" || course.role === "TEACHER" ? (
+                <CourseSetting
+                  role={course.role}
+                  name={course.name}
+                  details={course.details}
+                  briefName={course.briefName}
+                  id={id}
+                  handleUpdateCourse={(payload) => {
+                    setCourse((prevState) => ({ ...prevState, ...payload }));
+                    dispatch({ type: "COURSES_UPDATED", payload });
+                  }}
+                />
+              ) : (
+                <div>{course.role && <Navigate to="/404" />}</div>
+              )}
+            </div>
           }
         />
       </Routes>

@@ -7,10 +7,10 @@ router.get("/student/:courseId", gradeController.studentGetGrades);
 
 router.get("/:courseId", gradeController.getGrades);
 
-router.post("/finalize", gradeController.finalizeGrade);
+router.post("/finalize/:courseId", gradeController.finalizeGrade);
 
-router.post("/finalizeAssignment", gradeController.finalizeAssignment);
+router.post("/finalizeAssignment/:courseId", gradeController.finalizeAssignment);
 
-router.post("/edit", gradeController.editGrade);
+router.post("/edit/:courseId", gradeController.editGrade);
 
 export default router;

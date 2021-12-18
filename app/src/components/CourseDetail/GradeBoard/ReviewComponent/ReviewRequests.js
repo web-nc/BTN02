@@ -34,13 +34,16 @@ export default function ReviewRequests({ assignments, course }) {
     }
 
     React.useEffect(() => {
+        let isMounted = true;
         course._id && getCourseReviewRequest(course._id).then(res => {
-          setReviews(res.data.map((review) => {
+          if (isMounted) setReviews(res.data.map((review) => {
             const assignment = assignments.find(obj => { return obj._id === review.assignment });
             review.assignment = assignment.name;
             return review;
           }));
         });
+
+        return () => { isMounted = false; };
     }, [assignments, course]);
     return (
         <Paper elevation={10} sx={{ width: "60%", margin: "30px auto", padding: 3, boxSizing: "border-box" }}>

@@ -25,7 +25,13 @@ export default {
 
     getGrades: async (req, res) => {
         const courseId = req.params.courseId;
-        const course = await Course.findById(courseId, "gradeBoard");
+        const course = await Course.findById(courseId, [ "owner", "teachers", "gradeBoard" ]);
+        const userId = req.user._id;
+
+        const isTeacher = course.teachers.some((teacher) => userId.equals(teacher._id));
+        const isOwner = userId.equals(course.owner);
+
+        if (!(isTeacher || isOwner)) return res.status(401).json({ message: "NO_PERMISSION" });
 
         Assignment.find({
             course: courseId,
@@ -44,6 +50,15 @@ export default {
 
     editGrade: async (req, res) => {
         const { assignment, studentId, point, finalized } = req.body.data;
+        const userId = req.user._id;
+        const courseId = req.params.courseId;
+
+        const course = await Course.findById(courseId);
+
+        const isTeacher = course.teachers.some((teacher) => userId.equals(teacher._id));
+        const isOwner = userId.equals(course.owner);
+
+        if (!(isTeacher || isOwner)) return res.status(401).json({ message: "NO_PERMISSION" });
         
         Grade.updateOne(
             { assignment: assignment, studentId: studentId },
@@ -58,6 +73,15 @@ export default {
 
     finalizeGrade: async (req, res) => {
         const { assignment, studentId } = req.body.data;
+        const userId = req.user._id;
+        const courseId = req.params.courseId;
+
+        const course = await Course.findById(courseId);
+
+        const isTeacher = course.teachers.some((teacher) => userId.equals(teacher._id));
+        const isOwner = userId.equals(course.owner);
+
+        if (!(isTeacher || isOwner)) return res.status(401).json({ message: "NO_PERMISSION" });
 
         Grade.updateOne(
             { assignment: assignment, studentId: studentId},
@@ -71,6 +95,16 @@ export default {
     },
 
     finalizeAssignment: async (req, res) => {
+        const courseId = req.params.courseId;
+        const userId = req.user._id;
+
+        const course = await Course.findById(courseId);
+
+        const isTeacher = course.teachers.some((teacher) => userId.equals(teacher._id));
+        const isOwner = userId.equals(course.owner);
+
+        if (!(isTeacher || isOwner)) return res.status(401).json({ message: "NO_PERMISSION" });
+
         Grade.updateMany(
             { assignment: req.body.assignmentId },
             { finalized: true},

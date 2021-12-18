@@ -405,12 +405,9 @@ export default {
 
     const course = await Course.findOne({ _id: _id });
 
-    const isTeacher = course.teachers.some((teacher) =>
-      userId.equals(teacher._id)
-    );
     const isOwner = userId.equals(course.owner);
 
-    if (!(isTeacher || isOwner)) {
+    if (!isOwner) {
       return res.status(401).json({ message: "NO_PERMISSION" });
     }
 
