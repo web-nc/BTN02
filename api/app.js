@@ -43,7 +43,7 @@ const whitelist = ['https://midterm-classroom-app.netlify.app', 'http://localhos
 
 app.use(cors({
     credentials: true,
-    origin: whitelist
+    origin: [ ...whitelist, process.env.FRONTEND_URL ]
 }));
 app.use(passport.initialize());
 app.use(logger('dev'));
