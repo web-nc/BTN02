@@ -65,13 +65,21 @@ code {
 }
 
 .name h3,
-h5 {
+h5,
+h6 {
   display: flex;
   margin-top: 0.25rem;
 }
 
 .name h5 {
   font-weight: normal;
+}
+
+.name h6 {
+  font-weight: 100;
+  font-size: 15px;
+  margin-top: 1rem;
+  margin-left: 0.25rem;
 }
 
 .profile-avatar {

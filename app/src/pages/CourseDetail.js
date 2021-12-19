@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import CourseAssignment from "../components/CourseDetail/CourseAssignment/Assignment";
@@ -8,13 +9,14 @@ import CoursePeople from "../components/CourseDetail/CoursePeople/";
 import CourseSetting from "../components/CourseDetail/CourseSetting";
 import GradeBoard from "../components/CourseDetail/GradeBoard";
 import StudentGrade from "../components/CourseDetail/StudentGrade";
-import { getOneCourse } from "../services/course";
 import { getAssignments } from "../services/assignment";
-import { useDispatch } from "react-redux";
+import { getOneCourse } from "../services/course";
+import { getUser } from "../services/user";
 
 export default function CourseDetail() {
   const { id } = useParams();
   const [course, setCourse] = useState({});
+  const [user, setUser] = useState({});
   const dispatch = useDispatch();
 
   const [assignments, setAssignments] = useState([]);
@@ -33,7 +35,10 @@ export default function CourseDetail() {
         toast.warning(res.data.message);
       }
     });
-    getAssignments(id).then((res) => isMounted && setAssignments([...res.data.assignments]));
+    getAssignments(id).then(
+      (res) => isMounted && setAssignments([...res.data.assignments])
+    );
+    getUser().then((res) => isMounted && setUser(res.data)); //get user for studentGrade
 
     return () => {
       isMounted = false;
@@ -46,14 +51,27 @@ export default function CourseDetail() {
 
       <Routes>
         <Route path="*" element={<Navigate to="/404" />} />
-        <Route path="info" element={<CourseInfo role={course.role} course={course} assignments={assignments} />} />
+        <Route
+          path="info"
+          element={
+            <CourseInfo
+              role={course.role}
+              course={course}
+              assignments={assignments}
+            />
+          }
+        />
         <Route path="people" element={<CoursePeople course={course} />} />
         <Route
           path="studentGrade"
           element={
             <div>
               {course.role === "STUDENT" ? (
-                <StudentGrade course={course} assignments={assignments} />
+                <StudentGrade
+                  course={course}
+                  assignments={assignments}
+                  user={user}
+                />
               ) : (
                 <div>{course.role && <Navigate to="/404" />}</div>
               )}
@@ -70,7 +88,10 @@ export default function CourseDetail() {
                   course={course}
                   assignments={assignments}
                   handleUpdateCourse={(payload) => {
-                    setCourse((prevState) => ({ ...prevState, gradeBoard: payload }));
+                    setCourse((prevState) => ({
+                      ...prevState,
+                      gradeBoard: payload,
+                    }));
                   }}
                 />
               ) : (

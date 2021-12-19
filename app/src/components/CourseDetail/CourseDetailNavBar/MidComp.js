@@ -31,16 +31,11 @@ export default function MidComp({ role }) {
         </NavLink>
       )}
       {role && (role === "TEACHER" || role === "OWNER") && (
-        <NavLink end to="setting" className={classes.navLink}>
-          <Button color="inherit">Cài đặt</Button>
-        </NavLink>
-      )}
-      {role && (role === "TEACHER" || role === "OWNER") && (
         <NavLink end to="grade" className={classes.navLink}>
           <Button color="inherit">Bảng điểm</Button>
         </NavLink>
       )}
-      {role && (role === "STUDENT") && (
+      {role && role === "STUDENT" && (
         <NavLink end to="studentGrade" className={classes.navLink}>
           <Button color="inherit">Bài tập</Button>
         </NavLink>
